@@ -1,39 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>Know Yourself</title>
+
 <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
-<div class="container">
+<div class="app">
 
+<header>
 <h1>Know Yourself</h1>
+<p class="subtitle">Discover your personality</p>
+</header>
 
 <div class="progress">
-<div id="progressBar"></div>
+<div id="bar"></div>
 </div>
 
-<div id="quiz">
+<section id="quiz">
+
+<div class="card">
 
 <h2 id="question"></h2>
 
-<div id="answers"></div>
-
-<button id="nextBtn">Next</button>
+<div id="options"></div>
 
 </div>
 
-<div id="result" class="hidden">
-<h2>Your Personality</h2>
-<h3 id="type"></h3>
-<p id="description"></p>
+<button id="next">Next</button>
+
+</section>
+
+<section id="result" class="hidden">
+
+<div class="card result-card">
+
+<h2 id="type"></h2>
+<p id="desc"></p>
 
 <button onclick="location.reload()">Restart</button>
+
 </div>
+
+</section>
 
 </div>
 
