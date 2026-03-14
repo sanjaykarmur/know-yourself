@@ -200,8 +200,13 @@ position:absolute;
 height:100%;
 background:#38bdf8;
 left:0;
-width:50%;
+width:0%;
 transition:width .7s ease;
+}
+
+.trait-fill.right{
+left:auto;
+right:0;
 }
 
 .trait-num{
@@ -217,30 +222,20 @@ text-align:center;
 
 <div class="overlay" id="intro">
 <div class="card">
-
 <h1>Know Yourself</h1>
-
 <p>This short personality quiz helps you understand how you think, make decisions, interact with people, and organize your life.</p>
-
 <br>
-
 <p>You will answer <b>15 questions</b>. Each answer slightly adjusts your personality profile.</p>
-
 <br>
-
 <p>The quiz measures four traits:</p>
-
 <p>
 • Introvert vs Extrovert<br>
 • Practical vs Imaginative<br>
 • Logical vs Emotional<br>
 • Structured vs Flexible
 </p>
-
 <br>
-
 <button class="st-stp-btn" onclick="startQuiz()">Start Quiz</button>
-
 </div>
 </div>
 
@@ -264,7 +259,6 @@ text-align:center;
 <div class="error" id="error">Please select an option</div>
 
 </div>
-
 </div>
 
 <div class="app hidden result" id="resultPage">
@@ -335,50 +329,29 @@ render()
 },300)
 }
 
-const questionBank=[
+const flow=[
 
-{q:"In social situations you usually",
-o:[
-{t:"Observe quietly",type:"I"},
-{t:"Talk to few people",type:"I"},
-{t:"Meet many people",type:"E"},
-{t:"Lead conversations",type:"E"}]},
-
-{q:"When learning something new",
-o:[
-{t:"Prefer real examples",type:"S"},
-{t:"Focus on facts",type:"S"},
-{t:"Think about concepts",type:"N"},
-{t:"Imagine possibilities",type:"N"}]},
-
-{q:"When making decisions",
-o:[
-{t:"Use logic",type:"T"},
-{t:"Compare pros and cons",type:"T"},
-{t:"Think about people",type:"F"},
-{t:"Follow emotions",type:"F"}]},
-
-{q:"Your daily routine is",
-o:[
-{t:"Very organized",type:"J"},
-{t:"Mostly planned",type:"J"},
-{t:"Flexible",type:"P"},
-{t:"Spontaneous",type:"P"}]}
+{q:"At a social gathering you usually",o:[{t:"Stay with one or two people",type:"I"},{t:"Observe and listen first",type:"I"},{t:"Talk to many people",type:"E"},{t:"Start conversations easily",type:"E"}]},
+{q:"When starting a new skill you prefer",o:[{t:"Step by step instructions",type:"S"},{t:"Learning from real examples",type:"S"},{t:"Exploring concepts behind it",type:"N"},{t:"Experimenting with possibilities",type:"N"}]},
+{q:"When solving a difficult problem you usually",o:[{t:"Analyze logically",type:"T"},{t:"Break it into rational steps",type:"T"},{t:"Consider how people feel",type:"F"},{t:"Look for a solution that helps everyone",type:"F"}]},
+{q:"When planning a project you usually",o:[{t:"Make a clear schedule",type:"J"},{t:"Define steps before starting",type:"J"},{t:"Start and adjust along the way",type:"P"},{t:"Keep plans flexible",type:"P"}]},
+{q:"After a long day you feel recharged by",o:[{t:"Spending time alone",type:"I"},{t:"Quiet personal activities",type:"I"},{t:"Talking with friends",type:"E"},{t:"Being around people",type:"E"}]},
+{q:"When understanding something complex you prefer",o:[{t:"Practical demonstrations",type:"S"},{t:"Concrete details",type:"S"},{t:"Patterns and meanings",type:"N"},{t:"Future possibilities",type:"N"}]},
+{q:"When giving feedback to someone you usually",o:[{t:"Focus on what is correct logically",type:"T"},{t:"Point out improvements clearly",type:"T"},{t:"Be careful about their feelings",type:"F"},{t:"Encourage them emotionally",type:"F"}]},
+{q:"Your approach to deadlines is",o:[{t:"Finish well before time",type:"J"},{t:"Follow a clear timeline",type:"J"},{t:"Work when inspiration comes",type:"P"},{t:"Adjust timing as needed",type:"P"}]},
+{q:"During group discussions you often",o:[{t:"Listen more than speak",type:"I"},{t:"Think before sharing ideas",type:"I"},{t:"Speak actively",type:"E"},{t:"Enjoy leading the discussion",type:"E"}]},
+{q:"When learning about something new you prefer",o:[{t:"Practical uses",type:"S"},{t:"Real world applications",type:"S"},{t:"Creative possibilities",type:"N"},{t:"Theoretical ideas",type:"N"}]},
+{q:"When making an important choice you rely on",o:[{t:"Objective analysis",type:"T"},{t:"Clear logic",type:"T"},{t:"Personal values",type:"F"},{t:"Empathy toward others",type:"F"}]},
+{q:"When organizing your day you prefer",o:[{t:"A planned schedule",type:"J"},{t:"Structured tasks",type:"J"},{t:"Freedom to adjust",type:"P"},{t:"Flexible activities",type:"P"}]},
+{q:"At a new event you usually",o:[{t:"Observe quietly at first",type:"I"},{t:"Stay close to familiar people",type:"I"},{t:"Meet new people easily",type:"E"},{t:"Move around and socialize",type:"E"}]},
+{q:"When thinking about the future you often",o:[{t:"Focus on realistic outcomes",type:"S"},{t:"Consider practical steps",type:"S"},{t:"Imagine possibilities",type:"N"},{t:"Visualize different scenarios",type:"N"}]},
+{q:"When finishing tasks you prefer",o:[{t:"Completing everything early",type:"J"},{t:"Closing tasks properly",type:"J"},{t:"Keeping options open",type:"P"},{t:"Working flexibly",type:"P"}]}
 
 ]
 
-let flow=[]
 let answers=[]
 let score={I:0,E:0,S:0,N:0,T:0,F:0,J:0,P:0}
 let index=0
-
-function pickQuestion(){
-return JSON.parse(JSON.stringify(
-questionBank[Math.floor(Math.random()*questionBank.length)]
-))
-}
-
-while(flow.length<15){flow.push(pickQuestion())}
 
 const qEl=document.getElementById("question")
 const optEl=document.getElementById("options")
@@ -404,8 +377,7 @@ div.textContent=o.t
 if(prev===i)div.classList.add("selected")
 
 div.onclick=()=>{
-document.querySelectorAll(".option")
-.forEach(x=>x.classList.remove("selected"))
+document.querySelectorAll(".option").forEach(x=>x.classList.remove("selected"))
 div.classList.add("selected")
 answers[index]=i
 }
@@ -433,11 +405,9 @@ const type=flow[index].o[answers[index]].type
 score[type]++
 
 if(index===14){
-
 nextBtn.disabled=true
 nextBtn.innerHTML="Analysing your answers..."
-
-setTimeout(finish,2500)
+setTimeout(finish,2000)
 return
 }
 
@@ -453,47 +423,34 @@ render()
 }
 
 function percent(a,b){
-
-if(a===b){
-a+=1
-}
-
 const total=a+b
-
+if(total===0)return[50,50]
 return[
 Math.round(a/total*100),
 Math.round(b/total*100)
 ]
-
 }
 
-function setBar(barId,left,right){
-
-const bar=document.getElementById(barId)
-
+function setBar(id,left,right){
+const bar=document.getElementById(id)
 if(left>=right){
-bar.style.left="0"
-bar.style.right="auto"
+bar.classList.remove("right")
 bar.style.width=left+"%"
-}
-else{
-bar.style.right="0"
-bar.style.left="auto"
+}else{
+bar.classList.add("right")
 bar.style.width=right+"%"
 }
-
 }
 
 function highlightTrait(left,right,titleId,leftName,rightName){
 const el=document.getElementById(titleId)
-
-if(left>=right){
+if(left>right){
 el.innerHTML="<b>"+leftName+"</b> vs "+rightName
-}
-else{
+}else if(right>left){
 el.innerHTML=leftName+" vs <b>"+rightName+"</b>"
+}else{
+el.innerHTML=leftName+" vs "+rightName
 }
-
 }
 
 function finish(){
