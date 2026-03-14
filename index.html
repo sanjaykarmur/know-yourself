@@ -1,60 +1,554 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Know Yourself Quiz</title>
 
-<title>Know Yourself</title>
+<style>
 
-<link rel="stylesheet" href="style.css">
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:system-ui;
+-webkit-tap-highlight-color:transparent;
+}
 
+body{
+background:#0f172a;
+color:white;
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+transition:opacity .35s ease;
+}
+
+.app{
+width:100%;
+max-width:560px;
+}
+
+.card{
+background:#1e293b;
+padding:26px;
+border-radius:18px;
+box-shadow:0 10px 30px rgba(0,0,0,.4);
+animation:fadeIn .4s ease;
+}
+
+h1{margin-bottom:10px}
+p{opacity:.85}
+
+.progress{
+height:7px;
+background:#334155;
+border-radius:10px;
+overflow:hidden;
+margin-bottom:20px;
+}
+
+#bar{
+height:100%;
+width:0%;
+background:#38bdf8;
+transition:.3s;
+}
+
+#question{
+font-size:20px;
+margin-bottom:16px;
+}
+
+.options{
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+
+.option{
+border:2px solid #334155;
+padding:16px;
+border-radius:12px;
+cursor:pointer;
+transition:.15s;
+}
+
+.option:hover{transform:scale(1.02)}
+.option:active{transform:scale(.96)}
+
+.option.selected{
+border-color:#38bdf8;
+border-width:3px;
+transform:scale(1.03);
+}
+
+.controls{
+display:flex;
+gap:10px;
+margin-top:18px;
+}
+
+button{
+flex:1;
+padding:14px;
+border:none;
+border-radius:12px;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+background:#38bdf8;
+color:#020617;
+transition:transform .12s ease;
+}
+
+button:active{
+transform:scale(.94);
+}
+
+button:disabled{
+opacity:.6;
+cursor:not-allowed;
+}
+
+.back{
+background:#475569;
+color:white;
+}
+
+.hidden{display:none}
+
+.overlay{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:#020617;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+transition:opacity .4s ease;
+}
+
+.overlay .card{
+max-width:600px;
+}
+
+.result h2{
+font-size:30px;
+margin-bottom:12px;
+}
+
+.result p{
+margin-bottom:14px;
+line-height:1.5;
+}
+
+.error{
+margin-top:10px;
+font-size:14px;
+color:#f87171;
+display:none;
+}
+
+.st-stp-btn{
+transform:translateY(-1px);
+box-shadow:0 3px 5px rgba(0,0,0,0.2);
+width:100%;
+}
+
+@keyframes fadeIn{
+from{opacity:0}
+to{opacity:1}
+}
+
+.traits{
+margin-top:25px;
+display:flex;
+flex-direction:column;
+gap:18px;
+}
+
+.trait-title{
+font-size:14px;
+opacity:.9;
+margin-bottom:5px;
+text-align:center;
+}
+
+.trait-row{
+display:grid;
+grid-template-columns:40px 1fr 40px;
+align-items:center;
+gap:10px;
+}
+
+.trait-bar{
+height:10px;
+background:#334155;
+border-radius:8px;
+position:relative;
+overflow:hidden;
+}
+
+.trait-fill{
+position:absolute;
+height:100%;
+background:#38bdf8;
+left:0;
+width:50%;
+transition:width .7s ease;
+}
+
+.trait-num{
+font-size:13px;
+opacity:.85;
+text-align:center;
+}
+
+</style>
 </head>
 
 <body>
 
-<div class="app">
+<div class="overlay" id="intro">
+<div class="card">
 
-<header>
 <h1>Know Yourself</h1>
-<p class="subtitle">Discover your personality</p>
-</header>
+
+<p>This short personality quiz helps you understand how you think, make decisions, interact with people, and organize your life.</p>
+
+<br>
+
+<p>You will answer <b>15 questions</b>. Each answer slightly adjusts your personality profile.</p>
+
+<br>
+
+<p>The quiz measures four traits:</p>
+
+<p>
+• Introvert vs Extrovert<br>
+• Practical vs Imaginative<br>
+• Logical vs Emotional<br>
+• Structured vs Flexible
+</p>
+
+<br>
+
+<button class="st-stp-btn" onclick="startQuiz()">Start Quiz</button>
+
+</div>
+</div>
+
+<div class="app hidden" id="quizApp">
 
 <div class="progress">
 <div id="bar"></div>
 </div>
 
-<section id="quiz">
-
 <div class="card">
 
 <h2 id="question"></h2>
 
-<div id="options"></div>
+<div id="options" class="options"></div>
+
+<div class="controls">
+<button class="back" id="backBtn">Back</button>
+<button id="nextBtn">Next</button>
+</div>
+
+<div class="error" id="error">Please select an option</div>
 
 </div>
 
-<button id="next">Next</button>
+</div>
 
-</section>
+<div class="app hidden result" id="resultPage">
 
-<section id="result" class="hidden">
-
-<div class="card result-card">
+<div class="card">
 
 <h2 id="type"></h2>
-<p id="desc"></p>
 
-<button onclick="location.reload()">Restart</button>
+<p id="summary"></p>
+<p id="details"></p>
+
+<div class="traits">
+
+<div>
+<div class="trait-title" id="titleIE">Introvert vs Extrovert</div>
+<div class="trait-row">
+<div class="trait-num" id="numI"></div>
+<div class="trait-bar"><div id="barIE" class="trait-fill"></div></div>
+<div class="trait-num" id="numE"></div>
+</div>
+</div>
+
+<div>
+<div class="trait-title" id="titleSN">Practical vs Imaginative</div>
+<div class="trait-row">
+<div class="trait-num" id="numS"></div>
+<div class="trait-bar"><div id="barSN" class="trait-fill"></div></div>
+<div class="trait-num" id="numN"></div>
+</div>
+</div>
+
+<div>
+<div class="trait-title" id="titleTF">Logical vs Emotional</div>
+<div class="trait-row">
+<div class="trait-num" id="numT"></div>
+<div class="trait-bar"><div id="barTF" class="trait-fill"></div></div>
+<div class="trait-num" id="numF"></div>
+</div>
+</div>
+
+<div>
+<div class="trait-title" id="titleJP">Structured vs Flexible</div>
+<div class="trait-row">
+<div class="trait-num" id="numJ"></div>
+<div class="trait-bar"><div id="barJP" class="trait-fill"></div></div>
+<div class="trait-num" id="numP"></div>
+</div>
+</div>
 
 </div>
 
-</section>
+<br>
+
+<button class="st-stp-btn" onclick="restartQuiz()">Restart</button>
 
 </div>
+</div>
 
-<script src="questions.js"></script>
-<script src="script.js"></script>
+<script>
 
+function startQuiz(){
+const intro=document.getElementById("intro")
+intro.style.opacity="0"
+setTimeout(()=>{
+intro.style.display="none"
+document.getElementById("quizApp").classList.remove("hidden")
+render()
+},300)
+}
+
+const questionBank=[
+
+{q:"In social situations you usually",
+o:[
+{t:"Observe quietly",type:"I"},
+{t:"Talk to few people",type:"I"},
+{t:"Meet many people",type:"E"},
+{t:"Lead conversations",type:"E"}]},
+
+{q:"When learning something new",
+o:[
+{t:"Prefer real examples",type:"S"},
+{t:"Focus on facts",type:"S"},
+{t:"Think about concepts",type:"N"},
+{t:"Imagine possibilities",type:"N"}]},
+
+{q:"When making decisions",
+o:[
+{t:"Use logic",type:"T"},
+{t:"Compare pros and cons",type:"T"},
+{t:"Think about people",type:"F"},
+{t:"Follow emotions",type:"F"}]},
+
+{q:"Your daily routine is",
+o:[
+{t:"Very organized",type:"J"},
+{t:"Mostly planned",type:"J"},
+{t:"Flexible",type:"P"},
+{t:"Spontaneous",type:"P"}]}
+
+]
+
+let flow=[]
+let answers=[]
+let score={I:0,E:0,S:0,N:0,T:0,F:0,J:0,P:0}
+let index=0
+
+function pickQuestion(){
+return JSON.parse(JSON.stringify(
+questionBank[Math.floor(Math.random()*questionBank.length)]
+))
+}
+
+while(flow.length<15){flow.push(pickQuestion())}
+
+const qEl=document.getElementById("question")
+const optEl=document.getElementById("options")
+const bar=document.getElementById("bar")
+const error=document.getElementById("error")
+const backBtn=document.getElementById("backBtn")
+const nextBtn=document.getElementById("nextBtn")
+
+function render(){
+
+const q=flow[index]
+qEl.textContent=q.q
+optEl.innerHTML=""
+
+const prev=answers[index]
+
+q.o.forEach((o,i)=>{
+
+const div=document.createElement("div")
+div.className="option"
+div.textContent=o.t
+
+if(prev===i)div.classList.add("selected")
+
+div.onclick=()=>{
+document.querySelectorAll(".option")
+.forEach(x=>x.classList.remove("selected"))
+div.classList.add("selected")
+answers[index]=i
+}
+
+optEl.appendChild(div)
+
+})
+
+bar.style.width=(index/15*100)+"%"
+nextBtn.textContent=index===14?"Submit":"Next"
+backBtn.disabled=index===0
+
+}
+
+nextBtn.onclick=()=>{
+
+if(answers[index]==null){
+error.style.display="block"
+return
+}
+
+error.style.display="none"
+
+const type=flow[index].o[answers[index]].type
+score[type]++
+
+if(index===14){
+
+nextBtn.disabled=true
+nextBtn.innerHTML="Analysing your answers..."
+
+setTimeout(finish,2500)
+return
+}
+
+index++
+render()
+
+}
+
+backBtn.onclick=()=>{
+if(index===0)return
+index--
+render()
+}
+
+function percent(a,b){
+
+if(a===b){
+a+=1
+}
+
+const total=a+b
+
+return[
+Math.round(a/total*100),
+Math.round(b/total*100)
+]
+
+}
+
+function setBar(barId,left,right){
+
+const bar=document.getElementById(barId)
+
+if(left>=right){
+bar.style.left="0"
+bar.style.right="auto"
+bar.style.width=left+"%"
+}
+else{
+bar.style.right="0"
+bar.style.left="auto"
+bar.style.width=right+"%"
+}
+
+}
+
+function highlightTrait(left,right,titleId,leftName,rightName){
+const el=document.getElementById(titleId)
+
+if(left>=right){
+el.innerHTML="<b>"+leftName+"</b> vs "+rightName
+}
+else{
+el.innerHTML=leftName+" vs <b>"+rightName+"</b>"
+}
+
+}
+
+function finish(){
+
+document.getElementById("quizApp").classList.add("hidden")
+document.getElementById("resultPage").classList.remove("hidden")
+
+const type=
+(score.I>score.E?"I":"E")+
+(score.S>score.N?"S":"N")+
+(score.T>score.F?"T":"F")+
+(score.J>score.P?"J":"P")
+
+document.getElementById("type").textContent="Your Personality: "+type
+
+const desc={
+INTP:"You are a logical and curious thinker who enjoys analysing ideas.",
+ENFP:"You are energetic, imaginative and enjoy exploring possibilities.",
+ISTJ:"You are practical, responsible and value structure."
+}
+
+document.getElementById("summary").textContent=desc[type]||"You have a balanced personality."
+document.getElementById("details").textContent="Your answers show how strongly you lean toward certain thinking and behaviour styles."
+
+const [pI,pE]=percent(score.I,score.E)
+const [pS,pN]=percent(score.S,score.N)
+const [pT,pF]=percent(score.T,score.F)
+const [pJ,pP]=percent(score.J,score.P)
+
+document.getElementById("numI").textContent=pI
+document.getElementById("numE").textContent=pE
+document.getElementById("numS").textContent=pS
+document.getElementById("numN").textContent=pN
+document.getElementById("numT").textContent=pT
+document.getElementById("numF").textContent=pF
+document.getElementById("numJ").textContent=pJ
+document.getElementById("numP").textContent=pP
+
+setBar("barIE",pI,pE)
+setBar("barSN",pS,pN)
+setBar("barTF",pT,pF)
+setBar("barJP",pJ,pP)
+
+highlightTrait(score.I,score.E,"titleIE","Introvert","Extrovert")
+highlightTrait(score.S,score.N,"titleSN","Practical","Imaginative")
+highlightTrait(score.T,score.F,"titleTF","Logical","Emotional")
+highlightTrait(score.J,score.P,"titleJP","Structured","Flexible")
+
+}
+
+function restartQuiz(){
+document.body.style.opacity="0"
+setTimeout(()=>location.reload(),350)
+}
+
+</script>
 </body>
 </html>
