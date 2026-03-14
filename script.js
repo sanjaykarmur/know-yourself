@@ -1,93 +1,90 @@
-let index = 0
+let index=0
+let selected=null
 
-let score = {
-I:0,
-E:0,
-S:0,
-N:0,
-T:0,
-F:0,
-J:0,
-P:0
+const score={
+I:0,E:0,
+S:0,N:0,
+T:0,F:0,
+J:0,P:0
 }
 
-const questionEl = document.getElementById("question")
-const answersEl = document.getElementById("answers")
-const nextBtn = document.getElementById("nextBtn")
-const progressBar = document.getElementById("progressBar")
+const qEl=document.getElementById("question")
+const optEl=document.getElementById("options")
+const next=document.getElementById("next")
+const bar=document.getElementById("bar")
 
-let selected = null
+function load(){
 
-function loadQuestion(){
+const q=questions[index]
 
-const q = questions[index]
-
-questionEl.textContent = q.q
-answersEl.innerHTML = ""
-
-const aBtn = document.createElement("button")
-aBtn.textContent = "Option A"
-aBtn.onclick = ()=> select(q.a)
-
-const bBtn = document.createElement("button")
-bBtn.textContent = "Option B"
-bBtn.onclick = ()=> select(q.b)
-
-answersEl.appendChild(aBtn)
-answersEl.appendChild(bBtn)
-
-progressBar.style.width = (index/questions.length*100)+"%"
-
-}
-
-function select(type){
-selected = type
-}
-
-nextBtn.onclick = ()=>{
-
-if(!selected) return
-
-score[selected]++
-
-index++
+qEl.textContent=q.q
+optEl.innerHTML=""
 selected=null
 
+q.options.forEach(o=>{
+
+const div=document.createElement("div")
+div.className="option"
+div.textContent=o.t
+
+div.onclick=()=>{
+document.querySelectorAll(".option")
+.forEach(x=>x.classList.remove("selected"))
+
+div.classList.add("selected")
+selected=o.type
+}
+
+optEl.appendChild(div)
+
+})
+
+bar.style.width=(index/questions.length*100)+"%"
+
+}
+
+next.onclick=()=>{
+
+if(!selected)return
+
+score[selected]++
+index++
+
 if(index<questions.length){
-loadQuestion()
-}else{
-showResult()
+load()
+}
+else{
+finish()
 }
 
 }
 
-function showResult(){
+function finish(){
 
-document.getElementById("quiz").style.display="none"
+document.getElementById("quiz").classList.add("hidden")
 document.getElementById("result").classList.remove("hidden")
 
-let type =
+const type=
 (score.I>score.E?"I":"E")+
 (score.S>score.N?"S":"N")+
 (score.T>score.F?"T":"F")+
 (score.J>score.P?"J":"P")
 
-document.getElementById("type").textContent = type
-
-const descriptions={
-INTJ:"Strategic mastermind who loves solving complex problems.",
-ENTP:"Creative innovator who enjoys debating ideas.",
-INFJ:"Insightful guide focused on helping others.",
-ENFP:"Energetic explorer full of ideas.",
-ISTJ:"Responsible organizer who values reliability.",
-ISFP:"Quiet artist who enjoys creativity.",
-ESTP:"Bold risk taker who thrives on action.",
-ESFJ:"Warm helper who loves supporting people."
+const desc={
+INTJ:"Strategic thinker who enjoys solving complex problems.",
+ENTP:"Curious innovator who loves exploring new ideas.",
+INFJ:"Insightful and empathetic guide for others.",
+ENFP:"Energetic creative who inspires people.",
+ISTJ:"Reliable organizer who values responsibility.",
+ISFP:"Quiet creator who appreciates beauty and art.",
+ESTP:"Bold action taker who thrives on excitement.",
+ESFJ:"Supportive personality who enjoys helping others."
 }
 
-document.getElementById("description").textContent =
-descriptions[type] || "Unique personality with balanced traits."
+document.getElementById("type").textContent=type
+document.getElementById("desc").textContent=
+desc[type] || "Balanced personality with traits from many types."
 
 }
 
-loadQuestion()
+load()
